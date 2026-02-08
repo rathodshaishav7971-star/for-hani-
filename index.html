@@ -1,132 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Happy Propose Day Hani ❤️</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Propose Day Hani</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: radial-gradient(circle, #fff0f3 0%, #ffccd5 100%);
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
 
-<style>
-body{
-    margin:0;
-    height:100vh;
-    background:linear-gradient(135deg,#ff5f9e,#ffc371);
-    font-family:Arial, sans-serif;
-    overflow:hidden;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-}
+        #card {
+            background: white;
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 15px 35px rgba(255, 77, 109, 0.2);
+            text-align: center;
+            z-index: 10;
+            max-width: 450px;
+            border: 2px solid #ff4d6d;
+        }
 
-.card{
-    background:#fff;
-    padding:25px;
-    border-radius:20px;
-    text-align:center;
-    width:330px;
-    box-shadow:0 10px 25px rgba(0,0,0,0.3);
-    z-index:10;
-}
+        h1 { color: #ff4d6d; font-size: 2rem; margin-bottom: 10px; }
+        p { color: #444; font-size: 1.2rem; line-height: 1.4; }
 
-h2{color:#ff2e63;}
+        .btn-wrap {
+            margin-top: 30px;
+            height: 60px;
+            position: relative;
+        }
 
-button{
-    padding:10px 25px;
-    border:none;
-    border-radius:25px;
-    font-size:16px;
-    cursor:pointer;
-    margin:8px;
-}
+        button {
+            padding: 15px 35px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
 
-#yesBtn{background:#ff2e63;color:white;}
-#noBtn{background:#ddd;}
+        #yesBtn { background-color: #ff4d6d; color: white; cursor: pointer; }
+        #noBtn { 
+            background-color: #adb5bd; 
+            color: white; 
+            position: absolute; 
+            transition: 0.1s ease-out;
+            white-space: nowrap;
+        }
 
-#message{
-    display:none;
-    margin-top:15px;
-    font-size:15px;
-}
+        .hidden { display: none; }
 
-#gif{
-    display:none;
-    width:220px;
-    margin-top:15px;
-}
+        .heart-float {
+            position: absolute;
+            pointer-events: none;
+            z-index: 1;
+            animation: float Up 4s ease-in-out forwards;
+        }
 
-/* hearts */
-.heart{
-    position:absolute;
-    bottom:-20px;
-    animation:float 8s linear infinite;
-}
-
-@keyframes float{
-    to{transform:translateY(-120vh);opacity:0;}
-}
-</style>
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(0.5); opacity: 1; }
+            100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="card">
-    <h2>Happy Propose Day Hani ❤️</h2>
+    <audio id="proposeMusic">
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    </audio>
 
-    <p>Will you be mine forever? 💍</p>
-    <p><em>I don’t know about the future, but I know I want you in mine ❤️</em></p>
+    <div id="card">
+        <div id="step1">
+            <h1>Happy Propose Day Hani!</h1>
+            <p>"I don't know about the future,<br>but I want you in it."</p>
+            <p><strong>Will you be mine?</strong></p>
+            <div class="btn-wrap">
+                <button id="yesBtn">Yes</button>
+                <button id="noBtn">No</button>
+            </div>
+        </div>
 
-    <button id="yesBtn">YES 💖</button>
-    <button id="noBtn">NO 🙈</button>
-
-    <div id="message">
-        <strong>Congratulations 🎉</strong><br>
-        You've just unlocked unlimited care, smiles, and bad jokes 😜<br>
-        Thank you for choosing me ❤️
+        <div id="step2" class="hidden">
+            <h1>Congratulations!</h1>
+            <p>You've just unlocked unlimited care, smiles, and bad jokes 😜</p>
+            <p>Thank you for choosing me ❤️</p>
+            <img src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHYxc2x5amZ5ZzB6YmRzbmh6bmF6bmF6bmF6bmF6bmF6bmF6bmF6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/l41lH4ADRtAYnGsLe/giphy.gif" width="200" alt="Happy Dance">
+        </div>
     </div>
 
-    <img id="gif" src="dancing.gif">
-</div>
+    <script>
+        const noBtn = document.getElementById('noBtn');
+        const yesBtn = document.getElementById('yesBtn');
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+        const music = document.getElementById('proposeMusic');
 
-<audio id="music">
-    <source src="newlight.mp3" type="audio/mpeg">
-</audio>
+        // Logic for the 'No' button moving away
+        const moveButton = () => {
+            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth);
+            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight);
+            noBtn.style.left = x + 'px';
+            noBtn.style.top = y + 'px';
+        };
 
-<script>
-const yesBtn = document.getElementById("yesBtn");
-const noBtn  = document.getElementById("noBtn");
-const music  = document.getElementById("music");
+        noBtn.addEventListener('mouseover', moveButton);
+        noBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Prevents tapping on mobile
+            moveButton();
+            alert("Think again! 😉");
+        });
 
-yesBtn.addEventListener("click", () => {
-    document.getElementById("message").style.display="block";
-    document.getElementById("gif").style.display="block";
+        noBtn.addEventListener('click', () => alert("Think again! 😉"));
 
-    noBtn.style.display="none"; // NO hata do after YES
+        // Logic for 'Yes' button
+        yesBtn.addEventListener('click', () => {
+            step1.classList.add('hidden');
+            step2.classList.remove('hidden');
+            
+            // Play Music (New Light)
+            music.play().catch(e => console.log("Audio play blocked until interaction."));
 
-    music.currentTime = 0;
-    music.play();
+            // Launch Confetti
+            confetti({
+                particleCount: 200,
+                spread: 100,
+                origin: { y: 0.6 }
+            });
 
-    setInterval(createHeart, 250);
-});
+            // Start floating hearts loop
+            setInterval(createHeart, 200);
+        });
 
-noBtn.addEventListener("mouseover", moveNo);
-noBtn.addEventListener("touchstart", moveNo);
-
-function moveNo(){
-    noBtn.innerText="Think again 😏";
-    noBtn.style.position="absolute";
-    noBtn.style.left=Math.random()*70+"%";
-    noBtn.style.top=Math.random()*70+"%";
-}
-
-function createHeart(){
-    const h=document.createElement("div");
-    h.className="heart";
-    const hearts=["❤️","🖤","🤍","💖","💘","💝","💞","💜","💙","💚","🧡","💛","💕"];
-    h.innerHTML=hearts[Math.floor(Math.random()*hearts.length)];
-    h.style.left=Math.random()*100+"vw";
-    h.style.fontSize=(Math.random()*25+15)+"px";
-    document.body.appendChild(h);
-    setTimeout(()=>h.remove(),9000);
-}
-</script>
-
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart-float');
+            const emojis = ['❤️', '💖', '💘', '💝', '✨'];
+            heart.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+            heart.style.left = Math.random() * 100 + "vw";
+            heart.style.fontSize = (Math.random() * 20 + 20) + "px";
+            heart.style.animationDuration = (Math.random() * 2 + 2) + "s";
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 4000);
+        }
+    </script>
 </body>
 </html>
