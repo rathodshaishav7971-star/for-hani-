@@ -8,155 +8,141 @@
     <style>
         body {
             margin: 0; padding: 0; display: flex; justify-content: center; align-items: center;
-            height: 100vh; background: radial-gradient(circle, #fff0f3 0%, #ffccd5 100%);
-            font-family: 'Arial', sans-serif; overflow: hidden; text-align: center;
+            height: 100vh; background: #ffeef2; font-family: 'Arial', sans-serif; overflow: hidden;
         }
-
         #card {
-            background: white; padding: 40px; border-radius: 30px;
-            box-shadow: 0 15px 35px rgba(255, 77, 109, 0.3);
-            z-index: 10; max-width: 400px; width: 90%; border: 2px solid #ff4d6d;
+            background: white; padding: 30px; border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center;
+            width: 85%; max-width: 400px; border: 2px solid #ff4d6d; z-index: 100;
         }
-
-        h1 { color: #ff4d6d; font-size: 1.8rem; }
-        p { color: #444; font-size: 1.1rem; line-height: 1.5; min-height: 50px;}
-
-        .btn-wrap {
-            margin-top: 30px; height: 80px; position: relative;
-            display: flex; justify-content: center; align-items: center; gap: 20px;
-        }
-
-        button {
-            padding: 12px 30px; font-size: 1rem; font-weight: bold;
-            border: none; border-radius: 50px; cursor: pointer; transition: 0.2s;
-        }
-
-        .primary-btn { background-color: #ff4d6d; color: white; }
-        #noBtn { background-color: #adb5bd; color: white; position: absolute; transition: 0.1s ease-out; }
-
         .hidden { display: none !important; }
-
-        /* Animation for Hearts */
+        h1 { color: #ff4d6d; margin-bottom: 10px; font-size: 1.5rem; }
+        p { color: #444; font-size: 1.1rem; line-height: 1.5; }
+        button {
+            padding: 12px 25px; font-size: 1rem; border: none; border-radius: 50px;
+            cursor: pointer; font-weight: bold; margin-top: 20px;
+        }
+        .btn-yes { background: #ff4d6d; color: white; }
+        #noBtn { background: #adb5bd; color: white; position: absolute; }
         .heart-float {
-            position: absolute; pointer-events: none; z-index: 1;
-            animation: floatUp 4s ease-in-out forwards;
+            position: absolute; pointer-events: none;
+            animation: floatUp 4s linear forwards;
         }
         @keyframes floatUp {
-            0% { transform: translateY(100vh) scale(0.5); opacity: 1; }
-            100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
+            0% { transform: translateY(100vh); opacity: 1; }
+            100% { transform: translateY(-10vh); opacity: 0; }
         }
-
-        img { border-radius: 15px; margin-top: 15px; max-width: 100%; }
+        img { width: 100%; border-radius: 10px; margin-top: 15px; }
     </style>
 </head>
 <body>
 
-    <audio id="proposeMusic" loop>
+    <audio id="myMusic" loop>
         <source src="new-light.mp3" type="audio/mpeg">
     </audio>
 
-    <div id="step0" class="card-container">
-        <div id="card">
+    <div id="card">
+        <div id="screen0">
             <h1>Hi Hani... ❤️</h1>
-            <p>I made something special for you.</p>
-            <button class="primary-btn" onclick="startExperience()">Open it</button>
+            <p>I have a surprise for you.</p>
+            <button class="btn-yes" onclick="showProposal()">Open Surprise</button>
         </div>
-    </div>
 
-    <div id="step1" class="hidden">
-        <div id="card">
-            <h1 id="titleText"></h1>
+        <div id="screen1" class="hidden">
+            <h1 id="typedTitle"></h1>
             <p id="typedQuote"></p>
-            <div id="askContainer" class="hidden">
+            <div id="buttons" class="hidden">
                 <p><strong>Will you be mine?</strong></p>
-                <div class="btn-wrap">
-                    <button id="yesBtn" class="primary-btn">Yes</button>
+                <div style="height: 100px; position: relative; margin-top: 20px;">
+                    <button class="btn-yes" id="yesBtn">Yes</button>
                     <button id="noBtn">No</button>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div id="step2" class="hidden">
-        <div id="card">
+        <div id="screen2" class="hidden">
             <h1>Congratulations!</h1>
             <p>You've just unlocked unlimited care, smiles, and bad jokes 😜</p>
             <p>Thank you for choosing me ❤️</p>
-            <img src="dancing-happy-dance.gif" alt="Dancing Happy Dance">
+            <img src="dancing-happy-dance.gif" alt="Happy Dance">
         </div>
     </div>
 
     <script>
-        const music = document.getElementById('proposeMusic');
-        const noBtn = document.getElementById('noBtn');
+        const music = document.getElementById('myMusic');
 
-        function startExperience() {
-            document.getElementById('step0').classList.add('hidden');
-            document.getElementById('step1').classList.remove('hidden');
+        function showProposal() {
+            // 1. Play Music
+            music.play().catch(err => console.log("Music wait: ", err));
             
-            // Start Music Immediately on first interaction
-            music.play();
+            // 2. Switch Screens
+            document.getElementById('screen0').classList.add('hidden');
+            document.getElementById('screen1').classList.remove('hidden');
 
-            // Typing Animation
-            typeWriter("Happy Propose Day Hani!", "titleText", 100, () => {
-                typeWriter("I don't know about the future, but I want you in it.", "typedQuote", 50, () => {
-                    document.getElementById('askContainer').classList.remove('hidden');
-                });
-            });
+            // 3. Start Typing
+            startTyping();
         }
 
-        function typeWriter(text, elementId, speed, callback) {
-            let i = 0;
-            const element = document.getElementById(elementId);
-            function type() {
-                if (i < text.length) {
-                    element.innerHTML += text.charAt(i);
-                    i++;
-                    setTimeout(type, speed);
-                } else if (callback) {
-                    callback();
+        function startTyping() {
+            const title = "Happy Propose Day Hani!";
+            const quote = "I don't know about the future, but I want you in it.";
+            let i = 0, j = 0;
+
+            function typeTitle() {
+                if (i < title.length) {
+                    document.getElementById('typedTitle').innerHTML += title.charAt(i);
+                    i++; setTimeout(typeTitle, 70);
+                } else {
+                    typeQuote();
                 }
             }
-            type();
+
+            function typeQuote() {
+                if (j < quote.length) {
+                    document.getElementById('typedQuote').innerHTML += quote.charAt(j);
+                    j++; setTimeout(typeQuote, 50);
+                } else {
+                    document.getElementById('buttons').classList.remove('hidden');
+                }
+            }
+            typeTitle();
         }
 
-        // No Button Logic
+        // NO BUTTON JUMPING
+        const noBtn = document.getElementById('noBtn');
+        noBtn.addEventListener('mouseover', moveNo);
+        noBtn.addEventListener('touchstart', moveNo);
+
         function moveNo() {
-            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth - 20);
-            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight - 20);
+            const x = Math.random() * (window.innerWidth - 100);
+            const y = Math.random() * (window.innerHeight - 50);
             noBtn.style.left = x + 'px';
             noBtn.style.top = y + 'px';
             noBtn.style.position = 'fixed';
         }
 
-        noBtn.addEventListener('mouseover', moveNo);
-        noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveNo(); });
-        noBtn.addEventListener('click', () => alert("Think again! 😉"));
-
-        // Yes Button Logic
+        // YES BUTTON CLICK
         document.getElementById('yesBtn').addEventListener('click', () => {
-            document.getElementById('step1').classList.add('hidden');
-            document.getElementById('step2').classList.remove('hidden');
+            document.getElementById('screen1').classList.add('hidden');
+            document.getElementById('screen2').classList.remove('hidden');
             
             // Confetti
             setInterval(() => {
-                confetti({ particleCount: 50, spread: 70, origin: { y: 0.6 } });
+                confetti({ particleCount: 40, spread: 60, origin: { y: 0.7 } });
             }, 300);
 
-            // Floating Hearts
+            // Hearts
             setInterval(createHeart, 300);
         });
 
         function createHeart() {
             const heart = document.createElement('div');
-            heart.classList.add('heart-float');
-            const emojis = ['❤️', '💖', '💘', '💝', '💗', '💕'];
-            heart.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+            heart.className = 'heart-float';
+            heart.innerHTML = '❤️';
             heart.style.left = Math.random() * 100 + "vw";
-            heart.style.fontSize = (Math.random() * 20 + 20) + "px";
-            heart.style.animationDuration = (Math.random() * 2 + 3) + "s";
+            heart.style.fontSize = (Math.random() * 10 + 20) + "px";
             document.body.appendChild(heart);
-            setTimeout(() => heart.remove(), 5000);
+            setTimeout(() => heart.remove(), 4000);
         }
     </script>
 </body>
